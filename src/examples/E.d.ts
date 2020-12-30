@@ -50,3 +50,30 @@ export declare class E {
     /** @internal */
     get foo();
 }
+
+export declare class F {
+    /**
+     * The type of this object
+     *
+     * @internal protected
+     */
+    public type: string;
+
+    /** @internal protected */
+    public set foo(value: string);
+
+    /** @internal protected */
+    public get foo();
+
+    /** @internal protected */
+    public constructor(foo: string);
+
+    /**
+     * Something something
+     *
+     * @param foo Some parameter
+     * @returns Something else
+     * @internal protected
+     */
+    public bar(foo: string): number;
+}

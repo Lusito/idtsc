@@ -7,16 +7,19 @@
 
 idtsc (**i**nternal .**d**.**ts** **c**leanup). 
 
-It's a post-processing step to hide/protect internal properties & methods.
+It's a post-processing step to hide/protect internal properties & methods by adding jsdoc tags.
 
-- Transforms class properties marked with @internal:
-  - Making it private
-    - Why? If you just remove these properties, you get no warning when extended classes re-define them.
-  - Making the type `unknown`
-    - Why? To avoid referencing internal types
-  - Remove comments
-    - Why? They should not be used, so no need to keep the comments.
-- Removes exports marked with @internal
+- Transforms class properties marked with `@internal protected`:
+  - Access level is changed to protected
+  - The `@internal protected` will be removed from the jsdoc.
+- Transforms class properties marked with `@internal` (without `protected`):
+  - Access level is changed to private
+    - If you just remove these properties, you get no warning when extended classes re-define them.
+  - Type annotation is removed
+    - To avoid referencing internal types, this works similar to how tsc writes private properties
+  - Comments are removed
+    - They should not be used, so no need to keep the comments.
+- Removes exports marked with `@internal`
 
 It is meant to be run on your generated `.d.ts` files.
 
@@ -41,6 +44,9 @@ To mark your properties, methods and classes as internal, simply add a jsdoc tag
 export declare class A {
     /** @internal */
     public type: string;
+
+    /** @internal protected */
+    public sharedProp: string;
 }
 ```
 
@@ -84,6 +90,9 @@ export declare class A {
 
     /** something something */
     public prop: string;
+
+    /** @internal protected */
+    public sharedProp: string;
 
     /** @internal */
     public constructor(foo: string);
@@ -139,6 +148,8 @@ export declare class A {
 
     /** something something */
     public prop: string;
+
+    protected sharedProp: string;
 
     private constructor();
 

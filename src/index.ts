@@ -8,17 +8,49 @@ import { hideBin } from "yargs/helpers";
 
 const b = recast.types.builders;
 
-const unknownType = b.typeAnnotation(b.genericTypeAnnotation(b.identifier("unknown"), null));
+function cleanProtectedComment(node: any) {
+    const newComments: any[] = [];
+    let changed = false;
+    for (const comment of node.comments) {
+        // Remove the tag
+        let newValue = comment.value.replace(/@internal protected/, " ");
+        if (comment.value !== newValue) {
+            changed = true;
+            // Nothing remains, remove the comment
+            if (!newValue.replace(/[*\s]+/g, "")) continue;
+
+            // Try to fix the formatting
+            newValue = newValue
+                .replace(/\n\s*/g, "\n")
+                .replace(/\n\*/g, "\n *")
+                .replace(/[*\s]+$/, "");
+            if (newValue.includes("\n")) newValue += "\n ";
+            else newValue += " ";
+            comment.value = newValue;
+        }
+        newComments.push(comment);
+    }
+
+    if (changed) {
+        node.comments = newComments;
+    }
+}
 
 function fixInternal(node: any) {
     if (
         (!node.accessibility || node.accessibility === "public") &&
-        node.comments?.some((value: any) => value.value.includes("@internal"))
+        node.comments?.some((comment: any) => comment.value.includes("@internal"))
     ) {
+        if (node.comments.some((comment: any) => comment.value.includes("@internal protected"))) {
+            node.accessibility = "protected";
+            cleanProtectedComment(node);
+            return false;
+        }
+
         delete node.comments;
         node.accessibility = "private";
-        if (node.typeAnnotation) node.typeAnnotation = unknownType;
-        if (node.parameter?.typeAnnotation) node.parameter.typeAnnotation = unknownType;
+        if (node.typeAnnotation) delete node.typeAnnotation;
+        if (node.parameter?.typeAnnotation) delete node.parameter.typeAnnotation;
         return true;
     }
     return false;
@@ -29,16 +61,15 @@ function fixInternalMethod(path: any) {
     if (fixInternal(node)) {
         if (node.kind === "method") {
             const newNode = b.classProperty(b.identifier(node.key.name), b.identifier("null"));
-            newNode.typeAnnotation = unknownType;
             newNode.value = null;
             newNode.access = "private";
             path.replace(newNode);
             return;
         }
-        if (node.kind === "get") node.returnType = unknownType;
+        if (node.kind === "get") delete node.returnType;
         if (node.kind === "set") {
             const param = node.params[0];
-            if (param) param.typeAnnotation = unknownType;
+            if (param) delete param.typeAnnotation;
             else console.warn(`Setter '${node.key.name}' did not have a parameter`);
         } else {
             node.params = [];
