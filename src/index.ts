@@ -85,7 +85,7 @@ function fixFile(file: string, tabWidth: number) {
 }
 
 const { pattern, verbose, "tab-width": tabWidth } = yargs(hideBin(process.argv))
-    .command("$0 <pattern>", "Internal .d.ts cleanup", (y) =>
+    .command("$0 [pattern]", "Internal .d.ts cleanup", (y) =>
         y.positional("pattern", { default: "./dist/**/*.d.ts", description: "files to process (glob pattern)" })
     )
     .option("verbose", {

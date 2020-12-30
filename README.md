@@ -58,7 +58,7 @@ All you need to do is ensure that idtsc runs after the build:
 
 type `npx idtsc --help` to see all available options.
 
-Syntax: `idtsc [options] <pattern>`
+Syntax: `idtsc [options] [pattern]`
 ```
 Positionals:
   pattern  files to process (glob pattern)         [default: "./dist/**/*.d.ts"]
