@@ -115,7 +115,11 @@ function fixFile(file: string, tabWidth: number) {
     return result;
 }
 
-const { pattern, verbose, "tab-width": tabWidth } = yargs(hideBin(process.argv))
+const {
+    pattern,
+    verbose,
+    "tab-width": tabWidth,
+} = yargs(hideBin(process.argv))
     .command("$0 [pattern]", "Internal .d.ts cleanup", (y) =>
         y.positional("pattern", { default: "./dist/**/*.d.ts", description: "files to process (glob pattern)" })
     )
@@ -130,7 +134,8 @@ const { pattern, verbose, "tab-width": tabWidth } = yargs(hideBin(process.argv))
         default: 4,
         type: "number",
         description: "Use a different tab-width when formatting new code",
-    }).parseSync();
+    })
+    .parseSync();
 
 const files = glob.sync(pattern);
 for (const file of files) {

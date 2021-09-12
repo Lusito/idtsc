@@ -30,15 +30,15 @@
   "scripts": {
     "build": "rimraf dist && tsc -p ./tsconfig.build.json",
     "lint": "npm run lint:style && npm run lint:es && npm run lint:package",
-    "lint:es": "eslint src/**/*.ts --ext .ts,.tsx --ignore-path .prettierignore",
+    "lint:es": "eslint \"src/**/*.ts\" --ext \".ts,.tsx\" --ignore-path .prettierignore",
     "lint:es:fix": "npm run lint:es -- --fix",
     "lint:fix": "npm run lint:style:fix && npm run lint:es:fix && npm run lint:package:fix",
     "lint:package": "sort-package-json --check",
     "lint:package:fix": "sort-package-json",
     "lint:style": "npm run lint:style:base -- --check",
-    "lint:style:base": "prettier src/**/*.ts ./*.{js,json}",
+    "lint:style:base": "prettier \"src/**/*.ts\" \"./*.{js,json}\"",
     "lint:style:fix": "npm run lint:style:base -- --write",
-    "test": "rimraf examples && copyfiles -f ./src/examples/*.* ./examples/ && ts-node --files src/index.ts './examples/**/*.d.ts'"
+    "test": "rimraf examples && copyfiles -f \"./src/examples/*.*\" \"./examples/\" && ts-node --files \"src/index.ts\" \"./examples/**/*.d.ts\""
   },
   "dependencies": {
     "@babel/parser": "^7.15.6",
