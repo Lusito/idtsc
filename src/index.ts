@@ -130,7 +130,7 @@ const { pattern, verbose, "tab-width": tabWidth } = yargs(hideBin(process.argv))
         default: 4,
         type: "number",
         description: "Use a different tab-width when formatting new code",
-    }).argv;
+    }).parseSync();
 
 const files = glob.sync(pattern);
 for (const file of files) {
