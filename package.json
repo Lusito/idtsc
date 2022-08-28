@@ -38,7 +38,8 @@
     "lint:style": "npm run lint:style:base -- --check",
     "lint:style:base": "prettier \"src/**/*.ts\" \"./*.{js,json}\"",
     "lint:style:fix": "npm run lint:style:base -- --write",
-    "test": "rimraf examples && copyfiles -f \"./src/examples/*.*\" \"./examples/\" && ts-node --files \"src/index.ts\" \"./examples/**/*.d.ts\""
+    "test": "npm start && git diff --no-index --quiet examples expected",
+    "start": "rimraf examples && copyfiles -f \"./src/examples/*.*\" \"./examples/\" && ts-node --files \"src/index.ts\" \"./examples/**/*.d.ts\""
   },
   "dependencies": {
     "@babel/parser": "^7.18.3",

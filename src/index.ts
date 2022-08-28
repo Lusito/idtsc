@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 import * as recast from "recast";
 import * as parser from "recast/parsers/typescript";
+import type { Context } from "ast-types/lib/path-visitor";
+import type { NodePath } from "ast-types/lib/node-path";
+import type { namedTypes } from "ast-types/gen/namedTypes";
 import fs from "fs";
 import glob from "glob";
 import yargs from "yargs";
@@ -82,10 +85,66 @@ function fixInternalMethod(path: any) {
     }
 }
 
+function isUsedImport(path: NodePath<namedTypes.ImportDeclaration>, visitedIdentifiers: string[]) {
+    path.value.specifiers = path.value.specifiers.filter((spec: any) => visitedIdentifiers.includes(spec.local.name));
+    return path.value.specifiers.length > 0;
+}
+
+function addExportsDefinition(source: string) {
+    const ast = recast.parse(source, { parser });
+    let addExports = true;
+    function visit(this: Context, path: NodePath<any>) {
+        addExports = false;
+        this.traverse(path);
+    }
+    recast.visit(ast, {
+        visitImportDeclaration: visit,
+        visitImportSpecifier: visit,
+        visitImport: visit,
+        visitImportDefaultSpecifier: visit,
+        visitImportAttribute: visit,
+        visitImportExpression: visit,
+        visitImportNamespaceSpecifier: visit,
+        visitExportDeclaration: visit,
+        visitExportSpecifier: visit,
+        visitExportAllDeclaration: visit,
+        visitExportDefaultDeclaration: visit,
+        visitExportDefaultSpecifier: visit,
+        visitExportNamedDeclaration: visit,
+        visitExportNamespaceSpecifier: visit,
+        visitExportBatchSpecifier: visit,
+    });
+
+    return (addExports ? `${source}\nexport {};` : source).trim();
+}
+
+function removeUnusedImports(source: string, tabWidth: number, visitedIdentifiers: string[]) {
+    const ast = recast.parse(source, { parser });
+    recast.visit(ast, {
+        visitImportDeclaration(path) {
+            if (!isUsedImport(path, visitedIdentifiers)) {
+                path.prune();
+                return false;
+            }
+            this.traverse(path);
+            return undefined;
+        },
+    });
+
+    return addExportsDefinition(recast.print(ast, { tabWidth }).code);
+}
+
 function fixFile(file: string, tabWidth: number) {
     const source = fs.readFileSync(file, { encoding: "utf-8" });
     const ast = recast.parse(source, { parser });
+    const visitedIdentifiers: string[] = [];
     recast.visit(ast, {
+        visitIdentifier(path) {
+            if (path.parent.value.type !== "ImportSpecifier") {
+                visitedIdentifiers.push(path.value.name);
+            }
+            this.traverse(path);
+        },
         visitClassProperty(path) {
             fixInternal(path.node);
             this.traverse(path);
@@ -111,7 +170,8 @@ function fixFile(file: string, tabWidth: number) {
         },
     });
     const result = recast.print(ast, { tabWidth }).code;
-    if (source !== result) fs.writeFileSync(file, result);
+
+    if (source !== result) fs.writeFileSync(file, removeUnusedImports(result, tabWidth, visitedIdentifiers));
     return result;
 }
 
