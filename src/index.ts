@@ -3,9 +3,9 @@ import * as recast from "recast";
 import * as parser from "recast/parsers/typescript";
 import type { Context } from "ast-types/lib/path-visitor";
 import type { NodePath } from "ast-types/lib/node-path";
-import type { namedTypes } from "ast-types/gen/namedTypes";
+import type { namedTypes } from "ast-types/lib/gen/namedTypes";
 import fs from "fs";
-import glob from "glob";
+import { glob } from "glob";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
@@ -160,7 +160,7 @@ function fixFile(file: string, tabWidth: number) {
         visitExportNamedDeclaration(path) {
             if (path.node.comments?.some((value) => value.value.includes("@internal"))) {
                 console.warn(
-                    `- Warning: Export definition removed from "${file}", you might want to remove it entirely`
+                    `- Warning: Export definition removed from "${file}", you might want to remove it entirely`,
                 );
                 path.prune();
                 return false;
@@ -180,9 +180,8 @@ const {
     verbose,
     "tab-width": tabWidth,
 } = yargs(hideBin(process.argv))
-    .command("$0 [pattern]", "Internal .d.ts cleanup", (y) =>
-        y.positional("pattern", { default: "./dist/**/*.d.ts", description: "files to process (glob pattern)" })
-    )
+    .command("$0 [pattern]", "Internal .d.ts cleanup")
+    .positional("pattern", { default: "./dist/**/*.d.ts", description: "files to process (glob pattern)" })
     .option("verbose", {
         alias: "v",
         default: false,

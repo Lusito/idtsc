@@ -42,20 +42,20 @@
     "test": "npm start && git diff --no-index --quiet examples expected"
   },
   "dependencies": {
-    "@babel/parser": "^7.18.13",
-    "glob": "^8.0.3",
-    "recast": "^0.21.2",
-    "typescript": "^4.8.2",
-    "yargs": "^17.5.1"
+    "@babel/parser": "^7.24.6",
+    "glob": "^10.4.1",
+    "recast": "^0.23.7",
+    "typescript": "^5.4.5",
+    "yargs": "^17.7.2"
   },
   "devDependencies": {
-    "@lusito/eslint-config": "^2.0.3",
-    "@lusito/prettier-config": "^2.0.0",
-    "@types/node": "^18.7.13",
-    "@types/yargs": "^17.0.11",
+    "@lusito/eslint-config": "^3.0.1",
+    "@lusito/prettier-config": "^3.0.0",
+    "@types/node": "^20.12.13",
+    "@types/yargs": "^17.0.32",
     "copyfiles": "^2.4.1",
-    "rimraf": "^3.0.2",
-    "sort-package-json": "^1.57.0",
-    "ts-node": "^10.9.1"
+    "rimraf": "^5.0.7",
+    "sort-package-json": "^2.10.0",
+    "ts-node": "^10.9.2"
   }
 }
