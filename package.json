@@ -49,9 +49,11 @@
     "yargs": "^17.7.2"
   },
   "devDependencies": {
-    "@lusito/eslint-config": "^3.0.1",
-    "@lusito/prettier-config": "^3.0.0",
-    "@types/node": "^20.12.13",
+    "@babel/types": "^7.24.6",
+    "@lusito/eslint-config": "^3.1.0",
+    "@lusito/prettier-config": "^3.1.0",
+    "@lusito/tsconfig": "^1.0.2",
+    "@types/node": "^20.13.0",
     "@types/yargs": "^17.0.32",
     "copyfiles": "^2.4.1",
     "rimraf": "^5.0.7",
